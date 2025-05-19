@@ -94,5 +94,5 @@ mental_health_web/
 
 ## Контакты
 
-Проект создан в рамках ВКР.  
+Проект создан в рамках ВКР на ЦК.  
 По вопросам пишите в [Telegram → @daria_chugu](https://t.me/daria_chugu)
