@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О системе | Мониторинг психического здоровья</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse me-2"></i>
+                Система мониторинга психического здоровья
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about">О системе</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h2 class="card-title text-center mb-0">О системе мониторинга психического здоровья</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3>Описание проекта</h3>
+                        <p>
+                            Система мониторинга психического здоровья по текстовым сообщениям разработана в рамках ВКР по цифровой кафедре "Разработка и тестирование сервисов искусственного интеллекта". Система позволяет анализировать текстовые сообщения для выявления потенциальных проблем с психическим здоровьем, оценивать уровень риска и предоставлять соответствующие рекомендации.
+                        </p>
+                        <p>
+                            Система использует методы обработки естественного языка (NLP) и машинного обучения для анализа текста, а также включает компоненты для анализа настроения и эмоций на основе современных трансформерных моделей.
+                        </p>
+
+                        <h3 class="mt-4">Функциональность системы</h3>
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-chat-text text-primary me-2"></i>
+                                            Анализ текстовых сообщений
+                                        </h5>
+                                        <p class="card-text">
+                                            Система анализирует текстовые сообщения для выявления признаков проблем с психическим здоровьем, определяет категорию проблемы и оценивает уровень риска.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-emoji-smile text-primary me-2"></i>
+                                            Анализ настроения и эмоций
+                                        </h5>
+                                        <p class="card-text">
+                                            Система определяет общее настроение сообщения (позитивное/негативное) и анализирует присутствие различных эмоций в тексте.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-shield-check text-primary me-2"></i>
+                                            Оценка рисков
+                                        </h5>
+                                        <p class="card-text">
+                                            На основе анализа текста система определяет уровень риска для психического здоровья (низкий, средний, высокий) и формирует соответствующие рекомендации.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-lightbulb text-primary me-2"></i>
+                                            Персонализированные рекомендации
+                                        </h5>
+                                        <p class="card-text">
+                                            Система генерирует персонализированные рекомендации в зависимости от выявленных проблем и уровня риска.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="mt-4">Технологии</h3>
+                        <p>
+                            Система разработана с использованием следующих технологий:
+                        </p>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="bi bi-code-square text-primary me-2"></i>
+                                <strong>Python</strong> - основной язык программирования
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-braces text-primary me-2"></i>
+                                <strong>Flask</strong> - веб-фреймворк для создания API и веб-интерфейса
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-robot text-primary me-2"></i>
+                                <strong>NLTK</strong> - библиотека для обработки естественного языка
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-cpu text-primary me-2"></i>
+                                <strong>Scikit-learn</strong> - библиотека для машинного обучения
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-bar-chart text-primary me-2"></i>
+                                <strong>Chart.js</strong> - библиотека для визуализации данных
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-bootstrap text-primary me-2"></i>
+                                <strong>Bootstrap</strong> - фреймворк для создания адаптивного веб-интерфейса
+                            </li>
+                        </ul>
+
+                        <h3 class="mt-4">Важное примечание</h3>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Система не является заменой профессиональной помощи.</strong> Если вы испытываете серьезные проблемы с психическим здоровьем, обратитесь к квалифицированному специалисту.
+                        </div>
+
+                        <h3 class="mt-4">Автор</h3>
+                        <p>
+                            Чугунова Дарья ИКБО-12-21
+                        </p>
+                        <p>
+                            Система разработана в рамках ВКР по цифровой кафедре "Разработка и тестирование сервисов искусственного интеллекта".
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 Система мониторинга психического здоровья</p>
+            <p class="text-muted small">Разработано в рамках ВКР по цифровой кафедре "Разработка и тестирование сервисов искусственного интеллекта"</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
