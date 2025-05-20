@@ -354,13 +354,28 @@ class MentalHealthAnalyzer:
         text_lower = text.lower()
         results = {}
         
+        # Анализ для каждой эмоции
         for emotion, keywords in emotion_keywords.items():
-            count = sum(1 for word in keywords if word in text_lower)
-            # Нормализуем значение между 0 и 1 с некоторой случайностью
-            base_score = min(1.0, count * 0.2)
-            # Добавляем случайность для демонстрации
-            random_factor = (hash(text + emotion) % 10) / 20  # Значение между 0 и 0.5
-            score = min(0.95, max(0.05, base_score + random_factor))
+            # Подсчет ключевых слов
+            word_count = sum(1 for word in keywords if word in text_lower.split())
+            
+            # Подсчет фраз
+            phrase_count = sum(1 for phrase in emotion_phrases.get(emotion, []) if phrase in text_lower)
+            
+            # Учет усилителей
+            intensifier_count = sum(1 for word in self.intensifiers if word in text_lower.split())
+            
+            # Расчет базовой оценки с учетом весов
+            phrase_weight = 2.0  # Фразы имеют больший вес
+            base_score = (word_count + (phrase_count * phrase_weight)) / (len(keywords) + len(emotion_phrases.get(emotion, [])))
+            
+            # Корректировка на основе усилителей
+            intensity_factor = 1.0 + (intensifier_count * 0.1)
+            score = base_score * intensity_factor
+            
+            # Нормализация оценки
+            score = min(0.95, max(0.05, score))
+            
             results[emotion] = score
         
         return results
@@ -376,8 +391,22 @@ class MentalHealthAnalyzer:
             str: Предсказанная категория.
         """
         if not self.model or not self.vectorizer:
-            # Если модель не загружена, возвращаем заглушку
-            return "unknown"
+            # Если модель не загружена, используем эвристический подход
+            sentiment = self.analyze_sentiment(text)
+            emotions = self.analyze_emotions(text)
+            
+            # Определение категории на основе настроения и эмоций
+            if sentiment['label'] == 'NEGATIVE' and sentiment['score'] > 0.7:
+                if emotions.get('sadness', 0) > 0.6 or emotions.get('fear', 0) > 0.6:
+                    return "depression_anxiety"
+                elif emotions.get('anger', 0) > 0.6:
+                    return "anger_issues"
+                else:
+                    return "general_distress"
+            elif sentiment['label'] == 'POSITIVE' and sentiment['score'] > 0.7:
+                return "healthy"
+            else:
+                return "neutral"
         
         # Предобработка текста
         processed_text = self.preprocess_text(text)
@@ -416,37 +445,49 @@ class MentalHealthAnalyzer:
         if sentiment is None:
             sentiment = self.analyze_sentiment(text)
         
-        # Ключевые слова высокого риска
+        # Анализ эмоций для дополнительного контекста
+        emotions = self.analyze_emotions(text)
+        
+        # Проверка на контекстуальные фразы высокого риска
+        text_lower = text.lower()
+        high_risk_phrase_count = sum(1 for phrase in self.contextual_phrases['negative'] 
+                                    if phrase in text_lower and any(kw in phrase for kw in 
+                                                                 ['suicide', 'kill', 'die', 'end', 'life', 'harm']))
+        
+        # Проверка на ключевые слова высокого риска с учетом контекста
         high_risk_keywords = [
             'suicide', 'kill myself', 'end my life', 'want to die', 'better off dead',
             'no reason to live', 'can\'t go on', 'hopeless', 'worthless', 'burden',
             'never get better', 'unbearable', 'desperate', 'severe depression'
         ]
         
-        # Ключевые слова среднего риска
+        high_risk_word_count = sum(1 for keyword in high_risk_keywords if keyword in text_lower)
+        
+        # Проверка на ключевые слова среднего риска
         medium_risk_keywords = [
             'depressed', 'anxious', 'panic', 'overwhelmed', 'exhausted', 'stressed',
             'can\'t sleep', 'insomnia', 'no energy', 'tired all the time', 'worried',
             'fear', 'scared', 'lonely', 'isolated', 'sad', 'crying'
         ]
         
-        # Проверка на ключевые слова высокого риска
-        text_lower = text.lower()
-        for keyword in high_risk_keywords:
-            if keyword in text_lower:
-                return 'high'
-        
-        # Проверка на ключевые слова среднего риска
         medium_risk_count = sum(1 for keyword in medium_risk_keywords if keyword in text_lower)
         
-        # Учитываем настроение
+        # Учитываем настроение и эмоции
         is_negative = sentiment.get('label') == 'NEGATIVE'
         sentiment_score = sentiment.get('score', 0.5)
+        sadness_score = emotions.get('sadness', 0)
+        fear_score = emotions.get('fear', 0)
         
-        # Определение уровня риска
-        if medium_risk_count >= 3 and is_negative and sentiment_score > 0.8:
+        # Определение уровня риска с учетом всех факторов
+        if high_risk_phrase_count > 0 or high_risk_word_count >= 2:
             return 'high'
-        elif medium_risk_count >= 2 or (is_negative and sentiment_score > 0.7):
+        elif (medium_risk_count >= 3 and is_negative and sentiment_score > self.risk_thresholds['high']) or \
+             (sadness_score > 0.7 and fear_score > 0.6) or \
+             (prediction in ['depression_anxiety', 'severe_depression'] and sentiment_score > 0.8):
+            return 'high'
+        elif (medium_risk_count >= 2 or (is_negative and sentiment_score > self.risk_thresholds['medium'])) or \
+             (sadness_score > 0.5 or fear_score > 0.5) or \
+             prediction in ['general_distress', 'mild_depression']:
             return 'medium'
         else:
             return 'low'
