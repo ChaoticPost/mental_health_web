@@ -32,6 +32,7 @@ except LookupError:
 class MentalHealthAnalyzer:
     """
     Класс для анализа психического здоровья по текстовым сообщениям.
+    Предоставляет методы для оценки эмоционального состояния и уровня риска.
     """
     
     def __init__(self, model_path=None):
@@ -68,6 +69,129 @@ class MentalHealthAnalyzer:
             self.model = None
             self.label_encoder = None
             print(f"Предупреждение: Модель не найдена по пути {model_path}")
+    
+    def _initialize_word_lists(self):
+        """
+        Инициализация расширенных списков слов и фраз для анализа.
+        """
+        # Расширенный список негативных слов и фраз
+        self.negative_words = [
+            # Базовые негативные эмоции
+            'sad', 'depressed', 'unhappy', 'angry', 'miserable', 'terrible', 'awful', 
+            'horrible', 'bad', 'worse', 'worst', 'trouble', 'difficult', 'anxiety', 
+            'anxious', 'worry', 'worried', 'stressed', 'stress', 'lonely', 'alone', 'isolated',
+            
+            # Дополнительные негативные слова
+            'hopeless', 'helpless', 'worthless', 'useless', 'failure', 'pathetic',
+            'disappointed', 'disappointing', 'frustrated', 'frustrating', 'irritated',
+            'annoyed', 'upset', 'distressed', 'disturbed', 'devastated', 'heartbroken',
+            'hurt', 'pain', 'painful', 'suffering', 'agony', 'agonizing', 'torment',
+            'tortured', 'trapped', 'stuck', 'suffocating', 'drowning', 'dying',
+            'exhausted', 'tired', 'fatigue', 'drained', 'empty', 'numb', 'hollow',
+            'lost', 'confused', 'disoriented', 'overwhelmed', 'burdened', 'heavy',
+            'dark', 'darkness', 'gloomy', 'bleak', 'grim', 'desperate', 'despairing',
+            'suicidal', 'self-harm', 'self-hatred', 'self-loathing', 'guilt', 'shame',
+            'regret', 'remorse', 'bitter', 'resentful', 'vengeful', 'hateful', 'hate',
+            'disgusted', 'disgusting', 'repulsed', 'repulsive', 'sick', 'ill', 'unwell'
+        ]
+        
+        # Расширенный список позитивных слов и фраз
+        self.positive_words = [
+            # Базовые позитивные эмоции
+            'happy', 'good', 'great', 'excellent', 'wonderful', 'amazing', 'fantastic', 
+            'terrific', 'joy', 'joyful', 'content', 'satisfied', 'pleased', 'delighted', 
+            'glad', 'cheerful', 'peaceful', 'calm', 'relaxed', 'hopeful',
+            
+            # Дополнительные позитивные слова
+            'blessed', 'grateful', 'thankful', 'appreciative', 'inspired', 'motivated',
+            'energetic', 'vibrant', 'alive', 'thriving', 'flourishing', 'growing',
+            'improving', 'better', 'best', 'perfect', 'ideal', 'superb', 'outstanding',
+            'exceptional', 'remarkable', 'impressive', 'admirable', 'respected', 'valued',
+            'worthy', 'deserving', 'accomplished', 'successful', 'achieving', 'proud',
+            'confident', 'strong', 'resilient', 'brave', 'courageous', 'fearless',
+            'determined', 'persistent', 'dedicated', 'committed', 'focused', 'clear',
+            'bright', 'brilliant', 'smart', 'intelligent', 'wise', 'insightful',
+            'understanding', 'compassionate', 'empathetic', 'kind', 'loving', 'loved',
+            'adored', 'cherished', 'treasured', 'special', 'unique', 'extraordinary',
+            'incredible', 'unbelievable', 'miraculous', 'magical', 'enchanted', 'charmed'
+        ]
+        
+        # Контекстуальные фразы для анализа
+        self.contextual_phrases = {
+            'negative': [
+                'feel like giving up', 'want to give up', 'can\'t take it anymore',
+                'no point in trying', 'no reason to live', 'better off dead',
+                'want to die', 'thinking about suicide', 'considering suicide',
+                'planning suicide', 'end my life', 'take my life', 'kill myself',
+                'harm myself', 'hurt myself', 'cut myself', 'self harm',
+                'don\'t want to be here', 'don\'t want to exist', 'wish I was dead',
+                'wish I wasn\'t alive', 'wish I wasn\'t born', 'life is meaningless',
+                'life is pointless', 'life is worthless', 'no hope', 'no future',
+                'can\'t see a way out', 'trapped in darkness', 'drowning in sorrow',
+                'consumed by sadness', 'overwhelmed by sadness', 'crushed by depression',
+                'crippled by anxiety', 'paralyzed by fear', 'tormented by thoughts',
+                'haunted by memories', 'plagued by nightmares', 'can\'t sleep',
+                'can\'t eat', 'can\'t focus', 'can\'t concentrate', 'can\'t function',
+                'falling apart', 'breaking down', 'losing control', 'losing my mind',
+                'going crazy', 'going insane', 'nobody cares', 'nobody understands',
+                'nobody loves me', 'everyone hates me', 'everyone would be better off without me',
+                'I\'m a burden', 'I\'m worthless', 'I\'m useless', 'I\'m a failure',
+                'I\'m not good enough', 'I\'m not worthy', 'I\'m not deserving',
+                'I\'m not important', 'I\'m not needed', 'I\'m not wanted'
+            ],
+            'positive': [
+                'feeling better', 'getting better', 'improving', 'making progress',
+                'seeing improvement', 'seeing progress', 'feeling hopeful', 'have hope',
+                'looking forward', 'excited about future', 'optimistic about future',
+                'things are looking up', 'light at the end of the tunnel', 'silver lining',
+                'grateful for', 'thankful for', 'appreciate', 'blessed with', 'lucky to have',
+                'fortunate to have', 'happy with', 'content with', 'satisfied with',
+                'proud of myself', 'proud of what I\'ve accomplished', 'achieved a lot',
+                'made progress', 'overcome obstacles', 'conquered challenges',
+                'survived difficult times', 'got through tough times', 'persevered through',
+                'stayed strong', 'remained resilient', 'kept going', 'didn\'t give up',
+                'found strength', 'found courage', 'found peace', 'found happiness',
+                'found joy', 'found purpose', 'found meaning', 'life is good',
+                'life is beautiful', 'life is worth living', 'enjoying life',
+                'loving life', 'embracing life', 'living fully', 'living authentically',
+                'being true to myself', 'being myself', 'accepting myself',
+                'loving myself', 'taking care of myself', 'self-care', 'self-love',
+                'self-compassion', 'self-acceptance', 'self-respect', 'self-worth'
+            ]
+        }
+        
+        # Усилители и смягчители для анализа
+        self.intensifiers = [
+            'very', 'extremely', 'incredibly', 'really', 'truly', 'absolutely',
+            'completely', 'totally', 'utterly', 'deeply', 'profoundly', 'intensely',
+            'severely', 'terribly', 'horribly', 'awfully', 'desperately', 'seriously',
+            'exceptionally', 'extraordinarily', 'remarkably', 'particularly', 'especially',
+            'notably', 'significantly', 'substantially', 'considerably', 'greatly',
+            'highly', 'immensely', 'enormously', 'tremendously', 'exceedingly',
+            'excessively', 'overly', 'unduly', 'unbelievably', 'inconceivably',
+            'unimaginably', 'indescribably', 'unspeakably', 'unbearably', 'intolerably'
+        ]
+        
+        self.diminishers = [
+            'somewhat', 'slightly', 'a bit', 'a little', 'kind of', 'sort of',
+            'rather', 'fairly', 'quite', 'relatively', 'moderately', 'reasonably',
+            'partially', 'partly', 'somewhat', 'to some extent', 'to a degree',
+            'in a way', 'in some ways', 'more or less', 'pretty much', 'almost',
+            'nearly', 'practically', 'virtually', 'basically', 'essentially',
+            'approximately', 'roughly', 'about', 'around', 'or so', 'give or take',
+            'not very', 'not particularly', 'not especially', 'not notably',
+            'not significantly', 'not substantially', 'not considerably',
+            'not greatly', 'not terribly', 'not awfully', 'not exceptionally'
+        ]
+        
+        self.negations = [
+            'not', 'no', 'never', 'none', 'nobody', 'nothing', 'nowhere', 'neither',
+            'nor', 'hardly', 'scarcely', 'barely', 'rarely', 'seldom', 'don\'t',
+            'doesn\'t', 'didn\'t', 'won\'t', 'wouldn\'t', 'can\'t', 'cannot',
+            'couldn\'t', 'shouldn\'t', 'isn\'t', 'aren\'t', 'wasn\'t', 'weren\'t',
+            'haven\'t', 'hasn\'t', 'hadn\'t', 'without', 'lack', 'lacking', 'absent',
+            'absence', 'free from', 'free of', 'void of', 'devoid of', 'clear of'
+        ]
     
     def preprocess_text(self, text):
         """
