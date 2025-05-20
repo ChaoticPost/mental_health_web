@@ -573,20 +573,20 @@ class MentalHealthAnalyzer:
         Returns:
             dict: Результаты анализа.
         """
-        # Предсказание категории
-        prediction = self.predict(text)
-        
         # Анализ настроения
         sentiment = self.analyze_sentiment(text)
         
         # Анализ эмоций
         emotions = self.analyze_emotions(text)
         
+        # Предсказание категории
+        prediction = self.predict(text)
+        
         # Оценка уровня риска
         risk_level = self.assess_risk(text, prediction, sentiment)
         
         # Генерация рекомендаций
-        recommendations = self.generate_recommendations(risk_level)
+        recommendations = self.generate_recommendations(risk_level, emotions)
         
         # Формирование результата
         result = {
