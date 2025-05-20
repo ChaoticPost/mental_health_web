@@ -1,23 +1,28 @@
 """
-API маршруты для системы мониторинга психического здоровья
+API маршруты для системы мониторинга психического здоровья.
+Предоставляет эндпоинты для анализа текстовых сообщений.
 """
 
 from flask import Blueprint, request, jsonify
-import os
-import sys
 from src.models.analyzer import MentalHealthAnalyzer
 
 # Создаем Blueprint для API
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
-# Инициализируем анализатор без загрузки модели из файла
-# Используем встроенные эвристики для демонстрации
+# Инициализируем анализатор
+# В продакшн-версии здесь можно указать путь к модели
 analyzer = MentalHealthAnalyzer()
 
 @api_bp.route('/analyze', methods=['POST'])
 def analyze_text():
     """
-    Анализ текстового сообщения
+    Анализ текстового сообщения.
+    
+    Ожидает JSON с полем 'message', содержащим текст для анализа.
+    Возвращает результаты анализа психического здоровья.
+    
+    Returns:
+        JSON: Результаты анализа или сообщение об ошибке.
     """
     # Проверяем наличие JSON в запросе
     if not request.is_json:
@@ -40,6 +45,11 @@ def analyze_text():
 @api_bp.route('/health', methods=['GET'])
 def health_check():
     """
-    Проверка работоспособности API
+    Проверка работоспособности API.
+    
+    Используется для мониторинга доступности сервиса.
+    
+    Returns:
+        JSON: Статус работоспособности API.
     """
     return jsonify({'status': 'ok', 'message': 'API работает корректно'}), 200
