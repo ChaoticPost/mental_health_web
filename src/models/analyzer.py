@@ -240,38 +240,65 @@ class MentalHealthAnalyzer:
         Returns:
             dict: Результат анализа настроения.
         """
-        # Простая эвристика для демонстрации
-        # В реальном приложении здесь должна быть интеграция с моделью анализа настроения
-        
-        negative_words = ['sad', 'depressed', 'unhappy', 'angry', 'miserable', 'terrible', 'awful', 
-                         'horrible', 'bad', 'worse', 'worst', 'trouble', 'difficult', 'anxiety', 
-                         'anxious', 'worry', 'stressed', 'stress', 'lonely', 'alone', 'isolated']
-        
-        positive_words = ['happy', 'good', 'great', 'excellent', 'wonderful', 'amazing', 'fantastic', 
-                         'terrific', 'joy', 'joyful', 'content', 'satisfied', 'pleased', 'delighted', 
-                         'glad', 'cheerful', 'peaceful', 'calm', 'relaxed', 'hopeful']
-        
         text_lower = text.lower()
         
-        neg_count = sum(1 for word in negative_words if word in text_lower)
-        pos_count = sum(1 for word in positive_words if word in text_lower)
+        # Поиск контекстуальных фраз
+        neg_phrase_count = sum(1 for phrase in self.contextual_phrases['negative'] if phrase in text_lower)
+        pos_phrase_count = sum(1 for phrase in self.contextual_phrases['positive'] if phrase in text_lower)
         
-        total = neg_count + pos_count
+        # Поиск отдельных слов
+        neg_word_count = sum(1 for word in self.negative_words if word in text_lower.split())
+        pos_word_count = sum(1 for word in self.positive_words if word in text_lower.split())
+        
+        # Учет усилителей и смягчителей
+        intensifier_count = sum(1 for word in self.intensifiers if word in text_lower.split())
+        diminisher_count = sum(1 for word in self.diminishers if word in text_lower.split())
+        negation_count = sum(1 for word in self.negations if word in text_lower.split())
+        
+        # Расчет весов для фраз и слов
+        phrase_weight = 2.0  # Фразы имеют больший вес, чем отдельные слова
+        
+        # Расчет общего негативного и позитивного счета с учетом весов
+        neg_score = (neg_phrase_count * phrase_weight) + neg_word_count
+        pos_score = (pos_phrase_count * phrase_weight) + pos_word_count
+        
+        # Корректировка на основе усилителей и смягчителей
+        intensity_factor = 1.0 + (intensifier_count * 0.2) - (diminisher_count * 0.1)
+        
+        # Учет отрицаний (может инвертировать значение)
+        if negation_count % 2 == 1:  # Нечетное количество отрицаний инвертирует значение
+            neg_score, pos_score = pos_score, neg_score
+        
+        # Применение фактора интенсивности
+        neg_score *= intensity_factor
+        pos_score *= intensity_factor
+        
+        # Определение итогового настроения
+        total = neg_score + pos_score
         if total == 0:
-            # Если нет явных индикаторов, используем длину текста как эвристику
-            score = 0.5 + (len(text) % 10) / 20  # Случайное значение между 0.5 и 1.0
-            label = "POSITIVE" if score > 0.7 else "NEGATIVE"
+            # Если нет явных индикаторов, используем нейтральное значение
+            score = 0.5
+            label = "NEUTRAL"
         else:
-            if pos_count > neg_count:
-                score = 0.5 + 0.5 * (pos_count / total)
+            if pos_score > neg_score:
+                score = 0.5 + 0.5 * (pos_score / total)
                 label = "POSITIVE"
             else:
-                score = 0.5 + 0.5 * (neg_count / total)
+                score = 0.5 + 0.5 * (neg_score / total)
                 label = "NEGATIVE"
+        
+        # Применение порога чувствительности
+        if score > self.risk_thresholds['high']:
+            confidence = "HIGH"
+        elif score > self.risk_thresholds['medium']:
+            confidence = "MEDIUM"
+        else:
+            confidence = "LOW"
         
         return {
             "label": label,
-            "score": min(0.99, max(0.6, score))  # Ограничиваем значение между 0.6 и 0.99
+            "score": min(0.99, max(0.01, score)),  # Ограничиваем значение между 0.01 и 0.99
+            "confidence": confidence
         }
     
     def analyze_emotions(self, text):
