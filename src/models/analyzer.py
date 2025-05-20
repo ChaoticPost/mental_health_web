@@ -311,16 +311,44 @@ class MentalHealthAnalyzer:
         Returns:
             dict: Словарь с оценками различных эмоций.
         """
-        # Простая эвристика для демонстрации
-        # В реальном приложении здесь должна быть интеграция с моделью анализа эмоций
-        
+        # Расширенный словарь эмоций и связанных с ними ключевых слов
         emotion_keywords = {
-            'joy': ['happy', 'joy', 'delighted', 'glad', 'pleased', 'excited', 'cheerful'],
-            'sadness': ['sad', 'unhappy', 'depressed', 'down', 'miserable', 'heartbroken', 'gloomy'],
-            'anger': ['angry', 'mad', 'furious', 'outraged', 'irritated', 'annoyed', 'frustrated'],
-            'fear': ['afraid', 'scared', 'frightened', 'terrified', 'anxious', 'worried', 'nervous'],
-            'surprise': ['surprised', 'amazed', 'astonished', 'shocked', 'startled', 'unexpected'],
-            'disgust': ['disgusted', 'revolted', 'repulsed', 'sickened', 'appalled', 'horrified']
+            'joy': ['happy', 'joy', 'delighted', 'glad', 'pleased', 'excited', 'cheerful', 
+                   'elated', 'jubilant', 'thrilled', 'ecstatic', 'overjoyed', 'blissful'],
+            'sadness': ['sad', 'unhappy', 'depressed', 'down', 'miserable', 'heartbroken', 'gloomy',
+                       'melancholy', 'sorrowful', 'grief', 'despair', 'despondent', 'downcast'],
+            'anger': ['angry', 'mad', 'furious', 'outraged', 'irritated', 'annoyed', 'frustrated',
+                     'enraged', 'infuriated', 'irate', 'livid', 'seething', 'hostile'],
+            'fear': ['afraid', 'scared', 'frightened', 'terrified', 'anxious', 'worried', 'nervous',
+                    'panicked', 'alarmed', 'horrified', 'petrified', 'dread', 'terror'],
+            'surprise': ['surprised', 'amazed', 'astonished', 'shocked', 'startled', 'unexpected',
+                        'stunned', 'dumbfounded', 'bewildered', 'flabbergasted', 'astounded'],
+            'disgust': ['disgusted', 'revolted', 'repulsed', 'sickened', 'appalled', 'horrified',
+                       'nauseated', 'loathing', 'abhorrence', 'aversion', 'distaste'],
+            'trust': ['trust', 'believe', 'faith', 'confidence', 'reliance', 'dependence',
+                     'assurance', 'conviction', 'certainty', 'reliability', 'credibility'],
+            'anticipation': ['anticipate', 'expect', 'await', 'look forward', 'hope', 'excitement',
+                           'eagerness', 'enthusiasm', 'suspense', 'expectancy', 'preparation']
+        }
+        
+        # Контекстуальные фразы для эмоций
+        emotion_phrases = {
+            'joy': ['feeling happy', 'feeling great', 'on cloud nine', 'over the moon', 
+                   'walking on air', 'on top of the world', 'couldn\'t be happier'],
+            'sadness': ['feeling down', 'feeling blue', 'under the weather', 'heavy heart', 
+                       'broken heart', 'lost hope', 'lost interest', 'no motivation'],
+            'anger': ['makes me angry', 'drives me crazy', 'lost my temper', 'blew my top', 
+                     'flew off the handle', 'hit the roof', 'seeing red', 'blood boiling'],
+            'fear': ['scared to death', 'scared stiff', 'frightened to death', 'shaking in my boots', 
+                    'jumping out of my skin', 'heart in my mouth', 'sick with worry'],
+            'surprise': ['caught me off guard', 'didn\'t see that coming', 'took me by surprise', 
+                        'out of the blue', 'jaw dropped', 'stopped in my tracks'],
+            'disgust': ['makes me sick', 'turns my stomach', 'can\'t stand', 'can\'t bear', 
+                       'grosses me out', 'makes my skin crawl', 'leaves a bad taste'],
+            'trust': ['can count on', 'have faith in', 'put my trust in', 'rely on', 
+                     'believe in', 'have confidence in', 'depend on'],
+            'anticipation': ['looking forward to', 'can\'t wait for', 'counting down to', 
+                           'eagerly awaiting', 'excited about', 'anticipating']
         }
         
         text_lower = text.lower()
