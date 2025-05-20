@@ -44,6 +44,16 @@ class MentalHealthAnalyzer:
         self.stop_words = set(stopwords.words('english'))
         self.lemmatizer = WordNetLemmatizer()
         
+        # Расширенные списки слов для анализа
+        self._initialize_word_lists()
+        
+        # Пороги чувствительности для анализа
+        self.risk_thresholds = {
+            'high': 0.75,  # Порог для высокого риска
+            'medium': 0.5,  # Порог для среднего риска
+            'low': 0.25     # Порог для низкого риска
+        }
+        
         # Загрузка модели
         if model_path and os.path.exists(model_path):
             with open(model_path, 'rb') as f:
