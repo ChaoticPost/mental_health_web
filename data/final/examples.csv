@@ -1,0 +1,7 @@
+text,expected_risk
+"I want to kill myself, I can't take it anymore.",high
+I no longer see the point of living.,high
+"I feel so depressed lately, nothing brings me joy.",medium
+I'm struggling to get out of bed every morning.,medium
+"I had a bad day today, but tomorrow will be better.",low
+"Work has been stressful, but I'm managing.",low
